@@ -1014,22 +1014,61 @@ class MorphCloud(nn.Module, PyTorchModelHubMixin):
             ("module.",),
             ("module.", "model."),
             ("model.", "module."),
+            ("model.", "module.", "mapanything."),
+            ("module.", "model.", "mapanything."),
+            ("mapanything.",),
         ]
+
+        def _namespace_variants(key: str, replace_namespace: bool) -> List[str]:
+            """Yield candidate keys obtained by stripping legacy namespaces."""
+
+            variants: List[str] = [key]
+
+            if replace_namespace and "mapanything" in key:
+                variants.append(key.replace("mapanything", "morphcloud"))
+
+            # Some historical checkpoints prefixed parameters with the project
+            # namespace (``mapanything.``) while the refactor removed that
+            # nesting. Try removing the namespace entirely and repeat for the
+            # MorphCloud prefix in case checkpoints were already partially
+            # migrated.
+            for candidate in list(variants):
+                if candidate.startswith("mapanything."):
+                    variants.append(candidate[len("mapanything.") :])
+                if candidate.startswith("morphcloud."):
+                    variants.append(candidate[len("morphcloud.") :])
+
+            # Deduplicate while preserving order for deterministic behaviour.
+            seen = set()
+            unique_variants: List[str] = []
+            for candidate in variants:
+                if candidate not in seen:
+                    seen.add(candidate)
+                    unique_variants.append(candidate)
+
+            return unique_variants
 
         def _apply_transforms(
             prefixes: Tuple[str, ...], replace_namespace: bool
         ) -> Optional[Dict[str, torch.Tensor]]:
             remapped: "OrderedDict[str, torch.Tensor]" = OrderedDict()
+
             for key, value in state_dict.items():
-                new_key = key
+                stripped_key = key
                 for prefix in prefixes:
-                    if new_key.startswith(prefix):
-                        new_key = new_key[len(prefix) :]
-                if replace_namespace and "mapanything" in new_key:
-                    new_key = new_key.replace("mapanything", "morphcloud")
-                if new_key in remapped:
+                    if stripped_key.startswith(prefix):
+                        stripped_key = stripped_key[len(prefix) :]
+
+                resolved_key: Optional[str] = None
+                for candidate in _namespace_variants(stripped_key, replace_namespace):
+                    if candidate in reference_key_set:
+                        resolved_key = candidate
+                        break
+
+                if resolved_key is None or resolved_key in remapped:
                     return None
-                remapped[new_key] = value
+
+                remapped[resolved_key] = value
 
             if set(remapped.keys()) != reference_key_set:
                 return None
