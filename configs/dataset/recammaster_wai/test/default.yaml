@@ -1,0 +1,22 @@
+dataset_str:
+  "ReCamMasterWAI(
+    resolution=${dataset.recammaster_wai.test.dataset_resolution},
+    principal_point_centered=${dataset.recammaster_wai.test.principal_point_centered},
+    seed=${dataset.recammaster_wai.test.seed},
+    transform='${dataset.recammaster_wai.test.transform}',
+    data_norm_type='${dataset.recammaster_wai.test.data_norm_type}',
+    ROOT='${dataset.recammaster_wai.test.ROOT}',
+    dataset_metadata_dir='${dataset.recammaster_wai.test.dataset_metadata_dir}',
+    variable_num_views=${dataset.recammaster_wai.test.variable_num_views},
+    num_views=${dataset.recammaster_wai.test.num_views},
+    covisibility_thres=${dataset.recammaster_wai.test.covisibility_thres})"
+dataset_resolution: (480, 832)
+principal_point_centered: ${dataset.principal_point_centered}
+seed: 777
+transform: 'imgnorm'
+data_norm_type: ${model.data_norm_type}
+ROOT: ${root_data_dir}/recammaster/example_test_data
+dataset_metadata_dir: null
+variable_num_views: ${dataset.test.variable_num_views}
+num_views: ${dataset.num_views}
+covisibility_thres: null
