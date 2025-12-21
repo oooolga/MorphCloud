@@ -18,6 +18,7 @@ from morphcloud.datasets.wai.megadepth import MegaDepthWAI  # noqa
 from morphcloud.datasets.wai.mpsd import MPSDWAI  # noqa
 from morphcloud.datasets.wai.mvs_synth import MVSSynthWAI  # noqa
 from morphcloud.datasets.wai.paralleldomain4d import ParallelDomain4DWAI  # noqa
+from morphcloud.datasets.wai.recammaster import ReCamMasterWAI  # noqa
 from morphcloud.datasets.wai.sailvos3d import SAILVOS3DWAI  # noqa
 from morphcloud.datasets.wai.scannetpp import ScanNetPPWAI  # noqa
 from morphcloud.datasets.wai.spring import SpringWAI  # noqa
