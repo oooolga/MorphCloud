@@ -1,0 +1,22 @@
+dataset_str:
+  "DyCheckWAI(
+    split='${dataset.dycheck_wai.val.split}',
+    resolution=${dataset.dycheck_wai.val.dataset_resolution},
+    principal_point_centered=${dataset.dycheck_wai.val.principal_point_centered},
+    transform='${dataset.dycheck_wai.val.transform}',
+    data_norm_type='${dataset.dycheck_wai.val.data_norm_type}',
+    ROOT='${dataset.dycheck_wai.val.ROOT}',
+    dataset_metadata_dir='${dataset.dycheck_wai.val.dataset_metadata_dir}',
+    overfit_num_sets=${dataset.dycheck_wai.val.overfit_num_sets},
+    num_views=${dataset.dycheck_wai.val.num_views},
+    factor=${dataset.dycheck_wai.val.factor})"
+split: 'val'
+dataset_resolution: ${dataset.resolution_val}
+principal_point_centered: ${dataset.principal_point_centered}
+transform: 'imgnorm'
+data_norm_type: ${model.data_norm_type}
+ROOT: ${root_data_dir}/DyCheck-iphone
+dataset_metadata_dir: ${morphcloud_dataset_metadata_dir}
+overfit_num_sets: null
+num_views: ${dataset.num_views}
+factor: 2
