@@ -136,18 +136,28 @@ class DyCheckWAI(BaseDataset):
         splits_dir = os.path.join(scene_root, "splits")
         split_path = os.path.join(splits_dir, f"{self.split}.json")
 
+        print(f"[DEBUG] Looking for split file: {split_path}")
+        print(f"[DEBUG] Split file exists: {os.path.exists(split_path)}")
+
         if os.path.exists(split_path):
             with open(split_path, 'r') as f:
                 split_dict = json.load(f)
             
+            print(f"[DEBUG] Split dict keys: {split_dict.keys()}")
+            
             # Check if the expected keys exist
             if "frame_names" in split_dict:
+                frame_names = split_dict["frame_names"]
+                print(f"[DEBUG] frame_names type: {type(frame_names)}")
+                print(f"[DEBUG] First 5 frame_names: {frame_names[:5] if len(frame_names) > 0 else 'empty'}")
+                print(f"[DEBUG] Total frame_names: {len(frame_names)}")
                 return (
-                    np.array(split_dict["frame_names"]),
+                    np.array(frame_names),
                     np.array(split_dict.get("time_ids", []), dtype=np.uint32),
                     np.array(split_dict.get("camera_ids", []), dtype=np.uint32),
                 )
         
+        print(f"[DEBUG] Falling back to metadata-based split loading")
         # Fallback: filter frames from dataset.json based on camera_id
         # In DyCheck iPhone dataset: train uses camera_id=0, val uses camera_id!=0
         return self._load_split_from_metadata(scene_root)
