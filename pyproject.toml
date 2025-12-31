@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-data = ["pandas"]
+data = ["pandas", "imageio"]
 dev = ["pre-commit", "pytest", "pytest-cov", "ruff"]
 colmap = [
     "lightglue @ git+https://github.com/cvg/LightGlue.git",

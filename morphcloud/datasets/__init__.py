@@ -13,6 +13,7 @@ from morphcloud.datasets.wai.ase import ASEWAI  # noqa
 from morphcloud.datasets.wai.blendedmvs import BlendedMVSWAI  # noqa
 from morphcloud.datasets.wai.dl3dv import DL3DVWAI  # noqa
 from morphcloud.datasets.wai.dynamicreplica import DynamicReplicaWAI  # noqa
+from morphcloud.datasets.wai.dynavol import DynaVolWAI  # noqa
 from morphcloud.datasets.wai.eth3d import ETH3DWAI  # noqa
 from morphcloud.datasets.wai.megadepth import MegaDepthWAI  # noqa
 from morphcloud.datasets.wai.mpsd import MPSDWAI  # noqa

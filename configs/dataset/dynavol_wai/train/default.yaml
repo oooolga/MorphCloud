@@ -1,0 +1,26 @@
+dataset_str:
+  "DynaVolWAI(
+    split='${dataset.dynavol_wai.train.split}',
+    resolution=${dataset.dynavol_wai.train.dataset_resolution},
+    principal_point_centered=${dataset.dynavol_wai.train.principal_point_centered},
+    aug_crop=${dataset.dynavol_wai.train.aug_crop},
+    transform='${dataset.dynavol_wai.train.transform}',
+    data_norm_type='${dataset.dynavol_wai.train.data_norm_type}',
+    ROOT='${dataset.dynavol_wai.train.ROOT}',
+    dataset_metadata_dir='${dataset.dynavol_wai.train.dataset_metadata_dir}',
+    overfit_num_sets=${dataset.dynavol_wai.train.overfit_num_sets},
+    variable_num_views=${dataset.dynavol_wai.train.variable_num_views},
+    num_views=${dataset.dynavol_wai.train.num_views},
+    use_4view_variant=${dataset.dynavol_wai.train.use_4view_variant})"
+split: 'train'
+dataset_resolution: ${dataset.resolution_train}
+principal_point_centered: ${dataset.principal_point_centered}
+aug_crop: 16
+transform: 'colorjitter+grayscale+gaublur'
+data_norm_type: ${model.data_norm_type}
+ROOT: ${root_data_dir}/DynaVol
+dataset_metadata_dir: ${morphcloud_dataset_metadata_dir}
+overfit_num_sets: null
+variable_num_views: ${dataset.train.variable_num_views}
+num_views: ${dataset.num_views}
+use_4view_variant: false

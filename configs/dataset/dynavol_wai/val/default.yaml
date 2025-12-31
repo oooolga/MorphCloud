@@ -1,0 +1,22 @@
+dataset_str:
+  "DynaVolWAI(
+    split='${dataset.dynavol_wai.val.split}',
+    resolution=${dataset.dynavol_wai.val.dataset_resolution},
+    principal_point_centered=${dataset.dynavol_wai.val.principal_point_centered},
+    transform='${dataset.dynavol_wai.val.transform}',
+    data_norm_type='${dataset.dynavol_wai.val.data_norm_type}',
+    ROOT='${dataset.dynavol_wai.val.ROOT}',
+    dataset_metadata_dir='${dataset.dynavol_wai.val.dataset_metadata_dir}',
+    overfit_num_sets=${dataset.dynavol_wai.val.overfit_num_sets},
+    num_views=${dataset.dynavol_wai.val.num_views},
+    use_4view_variant=${dataset.dynavol_wai.val.use_4view_variant})"
+split: 'val'
+dataset_resolution: ${dataset.resolution_val}
+principal_point_centered: ${dataset.principal_point_centered}
+transform: 'imgnorm'
+data_norm_type: ${model.data_norm_type}
+ROOT: ${root_data_dir}/DynaVol
+dataset_metadata_dir: ${morphcloud_dataset_metadata_dir}
+overfit_num_sets: null
+num_views: ${dataset.num_views}
+use_4view_variant: false
