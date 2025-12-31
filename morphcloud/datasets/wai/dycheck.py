@@ -139,12 +139,75 @@ class DyCheckWAI(BaseDataset):
         if os.path.exists(split_path):
             with open(split_path, 'r') as f:
                 split_dict = json.load(f)
-            return (
-                np.array(split_dict["frame_names"]),
-                np.array(split_dict["time_ids"], np.uint32),
-                np.array(split_dict["camera_ids"], np.uint32),
-            )
-        return None, None, None
+            
+            # Check if the expected keys exist
+            if "frame_names" in split_dict:
+                return (
+                    np.array(split_dict["frame_names"]),
+                    np.array(split_dict.get("time_ids", []), dtype=np.uint32),
+                    np.array(split_dict.get("camera_ids", []), dtype=np.uint32),
+                )
+        
+        # Fallback: filter frames from dataset.json based on camera_id
+        # In DyCheck iPhone dataset: train uses camera_id=0, val uses camera_id!=0
+        return self._load_split_from_metadata(scene_root)
+    
+    def _load_split_from_metadata(self, scene_root):
+        """
+        Fallback method to create split from metadata when split files don't exist
+        or have different structure. Uses camera_id to determine split.
+        """
+        dataset_path = os.path.join(scene_root, "dataset.json")
+        metadata_path = os.path.join(scene_root, "metadata.json")
+        
+        if not os.path.exists(dataset_path) or not os.path.exists(metadata_path):
+            return None, None, None
+        
+        with open(dataset_path, 'r') as f:
+            dataset_dict = json.load(f)
+        
+        # Check if dataset.json has pre-split ids
+        if self.split == "train" and "train_ids" in dataset_dict:
+            frame_names = np.array(dataset_dict["train_ids"])
+        elif self.split == "val" and "val_ids" in dataset_dict:
+            frame_names = np.array(dataset_dict["val_ids"])
+        else:
+            # Fall back to filtering by camera_id from metadata
+            all_frame_names = np.array(dataset_dict["ids"])
+            
+            with open(metadata_path, 'r') as f:
+                metadata_dict = json.load(f)
+            
+            # Filter frames based on camera_id
+            # train: camera_id == 0, val: camera_id != 0
+            filtered_frames = []
+            for frame_name in all_frame_names:
+                if frame_name in metadata_dict:
+                    camera_id = metadata_dict[frame_name].get("camera_id", 0)
+                    if self.split == "train" and camera_id == 0:
+                        filtered_frames.append(frame_name)
+                    elif self.split == "val" and camera_id != 0:
+                        filtered_frames.append(frame_name)
+            
+            frame_names = np.array(filtered_frames)
+        
+        if len(frame_names) == 0:
+            return None, None, None
+        
+        # Load time_ids and camera_ids for filtered frames
+        with open(metadata_path, 'r') as f:
+            metadata_dict = json.load(f)
+        
+        time_ids = np.array(
+            [metadata_dict[k]["warp_id"] for k in frame_names if k in metadata_dict],
+            dtype=np.uint32
+        )
+        camera_ids = np.array(
+            [metadata_dict[k]["camera_id"] for k in frame_names if k in metadata_dict],
+            dtype=np.uint32
+        )
+        
+        return frame_names, time_ids, camera_ids
 
     def _load_camera(self, scene_root, frame_name, center, scale):
         """
@@ -270,23 +333,10 @@ class DyCheckWAI(BaseDataset):
         # Load scene info
         center, scale, near, far = self._load_scene_info(scene_root)
 
-        # Load metadata
-        all_frame_names, all_time_ids, all_camera_ids = self._load_metadata_info(scene_root)
+        # Load split-specific frames (handles both split files and metadata-based filtering)
+        frame_names, time_ids, camera_ids = self._load_split_info(scene_root)
 
-        # Try to load split-specific frames
-        split_frame_names, split_time_ids, split_camera_ids = self._load_split_info(scene_root)
-
-        if split_frame_names is not None:
-            frame_names = split_frame_names
-            time_ids = split_time_ids
-            camera_ids = split_camera_ids
-        else:
-            # Use all frames for the split
-            frame_names = all_frame_names
-            time_ids = all_time_ids
-            camera_ids = all_camera_ids
-
-        if len(frame_names) == 0:
+        if frame_names is None or len(frame_names) == 0:
             raise ValueError(f"No frames found in {scene_name} for split {self.split}")
 
         # Sample frame indices
